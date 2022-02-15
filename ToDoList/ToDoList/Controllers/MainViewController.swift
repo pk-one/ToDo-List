@@ -9,6 +9,12 @@ import UIKit
 
 class MainViewController: UIViewController {
     
+    private var allTasks: [TaskComposite] = [] {
+        didSet {
+            tableView.reloadData()
+        }
+    }
+    
 //MARK: - ui components
     private lazy var tableView = createTableView()
     
@@ -38,19 +44,31 @@ class MainViewController: UIViewController {
     }
     
     @objc private func addButtonTapped() {
-        print("add")
+        let alertController = UIAlertController(title: "Новая задача", message: nil, preferredStyle: .alert)
+        alertController.addTextField { textField in
+            textField.placeholder = "Опишите задачу"
+        }
+         
+        let okButton = UIAlertAction(title: "Ok", style: .default) { _ in
+            if let text = alertController.textFields?.first?.text {
+                let newTask = Task(name: text, date: Date())
+                self.allTasks.append(newTask)
+            }
+        }
+        alertController.addAction(okButton)
+        present(alertController, animated: true)
     }
 }
 
 //MARK: - UITableViewDataSource
 extension MainViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+        return allTasks.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: TaskTableViewCell.cellId, for: indexPath) as? TaskTableViewCell else { return UITableViewCell() }
-            
+        cell.configure(tasks: allTasks[indexPath.row])
         return cell
     }
 }
