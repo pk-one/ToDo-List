@@ -8,10 +8,12 @@
 import Foundation
  
 class Task: TaskComposite {
+    var tasks: [TaskComposite] = []
+
     var name: String
     var date: Date
     
-    private var allTasks = [TaskComposite]()
+    var allTasks = [TaskComposite]()
     
     init(name: String, date: Date) {
         self.name = name

@@ -1,21 +1,17 @@
 //
-//  ViewController.swift
+//  TaskViewController.swift
 //  ToDoList
 //
 //  Created by Pavel Olegovich on 15.02.2022.
 //
 
+import Foundation
 import UIKit
 
-class MainViewController: UIViewController {
+class TaskViewController: UIViewController {
     
+    var rootTask: TaskComposite!
     private let factory = TaskCellModelFactory()
-    
-    private var allTasks: [TaskComposite] = [] {
-        didSet {
-            tableView.reloadData()
-        }
-    }
     
 //MARK: - ui components
     private lazy var tableView = createTableView()
@@ -39,15 +35,15 @@ class MainViewController: UIViewController {
         view.addSubview(tableView)
         tableView.register(TaskTableViewCell.self, forCellReuseIdentifier: TaskTableViewCell.cellId)
     }
-//MARK: - setNavBar
     
+//MARK: - setNavBar
     private func setNavBar() {
-        title = "Tasks"
+        title = rootTask.name
         let rightBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonTapped))
         navigationItem.rightBarButtonItem = rightBarButton
     }
-//MARK: - setDelegates
     
+//MARK: - setDelegates
     private func setDelegates() {
         tableView.dataSource = self
         tableView.delegate = self
@@ -62,7 +58,8 @@ class MainViewController: UIViewController {
         let okButton = UIAlertAction(title: "Ok", style: .default) { _ in
             if let text = alertController.textFields?.first?.text, !text.isEmpty, text != " " {
                 let newTask = Task(name: text, date: Date())
-                self.allTasks.append(newTask)
+                self.rootTask?.allTasks.append(newTask)
+                self.tableView.reloadData()
             }
         }
         alertController.addAction(okButton)
@@ -71,14 +68,14 @@ class MainViewController: UIViewController {
 }
 
 //MARK: - UITableViewDataSource
-extension MainViewController: UITableViewDataSource {
+extension TaskViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return allTasks.count
+        return rootTask?.allTasks.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: TaskTableViewCell.cellId, for: indexPath) as? TaskTableViewCell else { return UITableViewCell() }
-        let task = factory.getViewModel(task: allTasks[indexPath.row])
+        let task = factory.getViewModel(task: rootTask.allTasks[indexPath.row])
         cell.configure(task: task)
         return cell
     }
@@ -86,9 +83,9 @@ extension MainViewController: UITableViewDataSource {
 
 
 //MARK: - UITableViewDelegate
-extension MainViewController: UITableViewDelegate {
+extension TaskViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let task = allTasks[indexPath.row]
+        let task = rootTask.allTasks[indexPath.row]
         let taskVC = TaskViewController()
         taskVC.rootTask = task
         self.navigationController?.pushViewController(taskVC, animated: true)
@@ -96,7 +93,7 @@ extension MainViewController: UITableViewDelegate {
 }
 
 //MARK: - setConstraints
-extension MainViewController {
+extension TaskViewController {
     private func setConstraints() {
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.topAnchor),

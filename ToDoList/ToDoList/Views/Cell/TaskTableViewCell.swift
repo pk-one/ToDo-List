@@ -16,12 +16,6 @@ class TaskTableViewCell: UITableViewCell {
     private lazy var dateTasksLabel = createLabel(fontSize: 16)
     private lazy var countSubTasksLabel = createLabel(fontSize: 30)
     
-    private lazy var dateFormatter: DateFormatter = {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "d MMMM yyyy в HH:mm"
-        return dateFormatter
-    }()
-    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupViews()
@@ -39,10 +33,10 @@ class TaskTableViewCell: UITableViewCell {
         self.addSubview(countSubTasksLabel)
     }
     
-    func configure(tasks: TaskComposite) {
-        nameLabel.text = tasks.name
-        dateTasksLabel.text = dateFormatter.string(from: tasks.date)
-        countSubTasksLabel.text = "0"
+    func configure(task: TaskCellViewModel) {
+        nameLabel.text = task.name
+        dateTasksLabel.text = task.date
+        countSubTasksLabel.text = "\(task.countSubTusks)"
     }
 }
 

@@ -10,4 +10,7 @@ import Foundation
 protocol TaskComposite {
     var name: String { get }
     var date: Date { get }
+    var allTasks: [TaskComposite] { get set }
+    
+    func add(task: TaskComposite)
 }
